@@ -1,0 +1,21 @@
+{% extends 'tasks/base.html' %}
+ 
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+<h1 class="text-secondary">My Tasks 💖</h1>
+<a class="btn btn-lg" style="background-color: #ffb5a7; color: white;" href="{% url 'create' %}">✨ Add New Task</a>
+</div>
+ 
+{% for task in tasks %}
+<div class="card mb-3 task-card shadow-sm">
+<div class="card-body">
+<h5 class="card-title {% if task.complete %}text-decoration-line-through text-muted{% endif %}">{{ task.title }}</h5>
+<p class="card-text small text-muted">
+            Due: {{ task.due_date|default:"No date set" }}
+</p>
+</div>
+</div>
+{% empty %}
+<p class="text-center text-muted mt-5">You're all done! Time for a nap. 😴</p>
+{% endfor %}
+{% endblock content %}
