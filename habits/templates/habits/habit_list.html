@@ -1,0 +1,34 @@
+{% extends 'tasks/base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="fw-bold text-muted">🌿 Your Habits</h2>
+  <a href="{% url 'habit_create' %}" class="btn btn-pink">➕ Add Habit</a>
+</div>
+
+<div class="row g-3">
+  {% for habit in habits %}
+  <div class="col-md-6">
+    <div class="card task-card p-3 d-flex flex-column justify-content-between">
+      <div>
+        <h5>{{ habit.name }}</h5>
+        <small class="text-muted">{{ habit.get_category_display }} • {{ habit.get_frequency_display }}</small>
+      </div>
+      <div class="d-flex justify-content-between align-items-center mt-2">
+        <div>🔥 Streak: <strong>{{ habit.streak }}</strong></div>
+        {% if habit.completed_today %}
+          <span class="badge bg-success">Done Today 🎉</span>
+        {% else %}
+          <form method="POST" action="{% url 'habit_toggle' habit.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-pink">Mark Done</button>
+          </form>
+
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <p class="text-center text-muted mt-4">No habits yet. Add your first one 🌸</p>
+  {% endfor %}
+</div>
+{% endblock %}

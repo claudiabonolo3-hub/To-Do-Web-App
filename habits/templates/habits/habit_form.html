@@ -1,0 +1,37 @@
+{% extends 'tasks/base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6 col-md-8">
+    <div class="card p-4 shadow-lg" style="border-radius: 16px; background: linear-gradient(135deg, #fffaf5, #ffe5ec);">
+      <h3 class="mb-4 text-center">🌿 Create a New Habit</h3>
+
+      <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Habit Name</label>
+          {{ form.name }}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Category</label>
+          {{ form.category }}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Frequency</label>
+          {{ form.frequency }}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Start Date</label>
+          <input type="date" name="start_date" class="form-control" required>
+        </div>
+
+        <div class="text-center">
+          <button type="submit" class="btn btn-pink px-4 py-2">✨ Save Habit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
