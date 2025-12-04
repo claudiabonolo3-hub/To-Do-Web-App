@@ -1,0 +1,653 @@
+<!-- todo_app/templates/todo_app/habits_view.html - Refined Version -->
+{% extends "todo_app/base_with_sidebar.html" %}
+{% load static %}
+
+{% block title %}Habits{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Habit Statistics Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border-left: 4px solid var(--primary-color);
+    transition: transform 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Improved Habit Cards - Subtle Completion */
+.habit-card-new {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border: 2px solid var(--gray-200);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.habit-card-new:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+/* Subtle completion state - minimal visual change */
+.habit-card-new.completed-today {
+    border-color: #10b981;
+    background: #f0fdf4;
+}
+
+.habit-check-box {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: var(--gray-100);
+    border: 2px solid var(--gray-300);
+}
+
+.habit-check-box.completed {
+    background: #f0fdf4;
+    border-color: #10b981;
+    color: #10b981;
+}
+
+.habit-check-box:hover {
+    transform: scale(1.05);
+    border-color: var(--primary-color);
+}
+
+.habit-info {
+    flex: 1;
+}
+
+.habit-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 8px;
+}
+
+.habit-streak-info {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.habit-progress-visual {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.day-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--gray-500);
+    font-weight: 600;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+}
+
+.day-dot.completed {
+    background: #f0fdf4;
+    color: #10b981;
+    border-color: #10b981;
+}
+
+.day-dot.today {
+    border-color: var(--primary-color);
+}
+
+/* AI Chatbot Floating Button */
+.chatbot-toggle {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    z-index: 999;
+    transition: all 0.3s ease;
+}
+
+.chatbot-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 30px rgba(0,0,0,0.3);
+}
+
+.chatbot-panel {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    width: 380px;
+    height: 500px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    display: none;
+    flex-direction: column;
+    z-index: 998;
+    overflow: hidden;
+}
+
+.chatbot-panel.show {
+    display: flex;
+}
+
+.chatbot-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chatbot-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: var(--gray-50);
+}
+
+.chat-message {
+    margin-bottom: 16px;
+    display: flex;
+    gap: 10px;
+}
+
+.message-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px;
+}
+
+.message-avatar.bot {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+}
+
+.message-avatar.user {
+    background: var(--gray-300);
+    color: var(--gray-700);
+}
+
+.message-bubble {
+    padding: 12px 16px;
+    border-radius: 16px;
+    max-width: 75%;
+    word-wrap: break-word;
+}
+
+.message-bubble.bot {
+    background: white;
+    color: var(--gray-900);
+    border: 1px solid var(--gray-200);
+}
+
+.message-bubble.user {
+    background: var(--primary-color);
+    color: white;
+    margin-left: auto;
+}
+
+.chat-message.user-message {
+    flex-direction: row-reverse;
+}
+
+.chatbot-input-area {
+    padding: 15px;
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    gap: 10px;
+}
+
+.chatbot-input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid var(--gray-300);
+    border-radius: 24px;
+    outline: none;
+    font-size: 14px;
+}
+
+.chatbot-send-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.chatbot-send-btn:hover {
+    background: var(--secondary-color);
+    transform: scale(1.05);
+}
+
+.typing-indicator {
+    display: none;
+    padding: 10px;
+}
+
+.typing-indicator.show {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gray-400);
+    animation: typing 1.4s infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-10px); }
+}
+
+/* Quick Action Buttons */
+.quick-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.quick-action-btn {
+    padding: 8px 16px;
+    background: white;
+    border: 2px solid var(--gray-200);
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.quick-action-btn:hover {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .chatbot-panel {
+        width: calc(100vw - 40px);
+        right: 20px;
+        height: 450px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+</style>
+{% endblock %}
+
+{% block main_content %}
+<div class="habits-container">
+    <!-- Header Section -->
+    <div class="page-header">
+        <div class="header-left">
+            <h1 class="page-title">My Habits</h1>
+            <p style="color: var(--gray-600); margin-top: 5px;">Build consistency, track progress, achieve goals</p>
+        </div>
+        <button id="add-habit-btn" class="add-btn gradient-add-btn">
+            <i class="fa-solid fa-plus"></i> New Habit
+        </button>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">{{ total_habits }}</div>
+            <div class="stat-label">Total Habits</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ habits_completed_today|length }}</div>
+            <div class="stat-label">Completed Today</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ total_streak }}</div>
+            <div class="stat-label">Total Streak Days</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ completion_rate }}%</div>
+            <div class="stat-label">Completion Rate</div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <button class="quick-action-btn" onclick="filterHabits('all')">All</button>
+        <button class="quick-action-btn" onclick="filterHabits('today')">Today</button>
+        <button class="quick-action-btn" onclick="filterHabits('streak')">Best Streaks</button>
+    </div>
+
+    <!-- Habits List -->
+    {% if not user_habits %}
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="fa-solid fa-chart-line"></i>
+        </div>
+        <p class="empty-text">No habits yet</p>
+        <p class="empty-subtext">Start building better habits today!</p>
+    </div>
+    {% else %}
+    <div class="habits-list-new">
+        {% for habit in user_habits %}
+        <div class="habit-card-new {% if habit.is_completed_today %}completed-today{% endif %}" data-habit-id="{{ habit.id }}" data-frequency="{{ habit.frequency }}">
+            <!-- Completion Checkbox -->
+            <form method="POST" action="{% url 'complete_habit' habit.id %}" style="margin: 0;">
+                {% csrf_token %}
+                <button type="submit" class="habit-check-box {% if habit.is_completed_today %}completed{% endif %}">
+                    {% if habit.is_completed_today %}
+                    <i class="fa-solid fa-circle-check"></i>
+                    {% else %}
+                    <i class="fa-regular fa-circle"></i>
+                    {% endif %}
+                </button>
+            </form>
+
+            <!-- Habit Info -->
+            <div class="habit-info">
+                <div class="habit-name">{{ habit.title }}</div>
+                <div class="habit-streak-info">
+                    <span style="display: flex; align-items: center; gap: 4px; color: #ea580c; font-weight: 600; font-size: 14px;">
+                        <i class="fa-solid fa-fire"></i> {{ habit.get_streak }} day streak
+                    </span>
+                    <span style="color: var(--gray-500); font-size: 13px;">•</span>
+                    <span style="color: var(--gray-600); font-size: 13px;">{{ habit.get_frequency_display }}</span>
+                </div>
+            </div>
+
+            <!-- Progress Visual (frequency-aware) -->
+            <div class="habit-progress-visual" data-frequency="{{ habit.frequency }}">
+                {% if habit.frequency == 'daily' %}
+                    {% for day in habit.last_7_days %}
+                    <div class="day-dot {% if day.completed %}completed{% endif %} {% if day.is_today %}today{% endif %}" 
+                         title="{{ day.date|date:'M d' }}">
+                        {{ day.day_initial }}
+                    </div>
+                    {% endfor %}
+                {% elif habit.frequency == 'weekly' %}
+                    {% for week in habit.last_4_weeks %}
+                    <div class="day-dot {% if week.completed %}completed{% endif %} {% if week.is_current %}today{% endif %}" 
+                         title="Week {{ week.week_num }}">
+                        W{{ week.week_num }}
+                    </div>
+                    {% endfor %}
+                {% elif habit.frequency == 'monthly' %}
+                    {% for month in habit.last_3_months %}
+                    <div class="day-dot {% if month.completed %}completed{% endif %} {% if month.is_current %}today{% endif %}" 
+                         title="{{ month.month_name }}">
+                        {{ month.month_initial }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Delete Button -->
+            <form method="POST" action="{% url 'delete_habit' habit.id %}" onsubmit="return confirm('Delete this habit?');" style="margin: 0;">
+                {% csrf_token %}
+                <button type="submit" class="delete-icon" style="margin-left: 10px;">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- AI Chatbot -->
+<button class="chatbot-toggle" id="chatbot-toggle">
+    <i class="fa-solid fa-robot"></i>
+</button>
+
+<div class="chatbot-panel" id="chatbot-panel">
+    <div class="chatbot-header">
+        <i class="fa-solid fa-robot" style="font-size: 24px;"></i>
+        <div>
+            <div style="font-weight: 600;">Habit Coach</div>
+            <div style="font-size: 12px; opacity: 0.9;">Ask me anything about habits</div>
+        </div>
+    </div>
+    
+    <div class="chatbot-messages" id="chatbot-messages">
+        <div class="chat-message">
+            <div class="message-avatar bot">
+                <i class="fa-solid fa-robot"></i>
+            </div>
+            <div class="message-bubble bot">
+                Hi! I'm your habit coach. Ask me for tips, motivation, or advice on building better habits! 💪
+            </div>
+        </div>
+    </div>
+    
+    <div class="typing-indicator" id="typing-indicator">
+        <div class="message-avatar bot">
+            <i class="fa-solid fa-robot"></i>
+        </div>
+        <div style="display: flex; gap: 4px; padding: 10px;">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+        </div>
+    </div>
+    
+    <div class="chatbot-input-area">
+        <input type="text" id="chatbot-input" class="chatbot-input" placeholder="Ask me anything..." />
+        <button class="chatbot-send-btn" id="chatbot-send">
+            <i class="fa-solid fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Add Habit Modal (NO TARGET COUNT) -->
+<div id="habit-modal" class="modal-overlay">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <h2>Add New Habit</h2>
+            <button class="modal-close">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'add_habit' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Habit Name *</label>
+                <input type="text" name="title" class="form-input" placeholder="e.g. Morning Exercise" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Goal Description *</label>
+                <textarea name="goal_description" class="form-input" rows="2" placeholder="e.g. Exercise for 30 minutes" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Frequency</label>
+                <select name="frequency" class="form-input">
+                    <option value="daily" selected>Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                </select>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary modal-cancel">Cancel</button>
+                <button type="submit" class="btn-primary">Add Habit</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Modal handling
+    const modal = document.getElementById('habit-modal');
+    const addBtn = document.getElementById('add-habit-btn');
+    const closeBtn = modal.querySelector('.modal-close');
+    const cancelBtn = modal.querySelector('.modal-cancel');
+    
+    addBtn.addEventListener('click', () => modal.classList.add('show'));
+    closeBtn.addEventListener('click', () => modal.classList.remove('show'));
+    cancelBtn.addEventListener('click', () => modal.classList.remove('show'));
+    
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('show');
+    });
+
+    // Chatbot functionality with FIXED API call
+    const chatbotToggle = document.getElementById('chatbot-toggle');
+    const chatbotPanel = document.getElementById('chatbot-panel');
+    const chatbotInput = document.getElementById('chatbot-input');
+    const chatbotSend = document.getElementById('chatbot-send');
+    const chatbotMessages = document.getElementById('chatbot-messages');
+    const typingIndicator = document.getElementById('typing-indicator');
+
+    chatbotToggle.addEventListener('click', () => {
+        chatbotPanel.classList.toggle('show');
+        if (chatbotPanel.classList.contains('show')) {
+            chatbotInput.focus();
+        }
+    });
+
+    function addMessage(text, isUser = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${isUser ? 'user-message' : ''}`;
+        
+        messageDiv.innerHTML = `
+            <div class="message-avatar ${isUser ? 'user' : 'bot'}">
+                <i class="fa-solid fa-${isUser ? 'user' : 'robot'}"></i>
+            </div>
+            <div class="message-bubble ${isUser ? 'user' : 'bot'}">
+                ${text}
+            </div>
+        `;
+        
+        chatbotMessages.appendChild(messageDiv);
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+
+    async function sendMessage() {
+        const message = chatbotInput.value.trim();
+        if (!message) return;
+
+        addMessage(message, true);
+        chatbotInput.value = '';
+        typingIndicator.classList.add('show');
+
+        // Predefined responses for common questions (fallback)
+        const responses = {
+            'motivated': 'Start small! Break habits into tiny steps. Celebrate small wins. Track your progress visually. Remember: consistency beats perfection every time! 🎯',
+            'morning': 'Great morning habits: 1) Wake at same time daily 2) Hydrate first thing 3) 10-min stretch/exercise 4) Healthy breakfast 5) Review your goals. Start with just ONE! ☀️',
+            'stick': 'To stick with habits: 1) Stack with existing routines 2) Remove friction 3) Make it enjoyable 4) Track your streak 5) Have an accountability partner. Which will you try? 💪',
+            'start': 'Start simple! Pick ONE habit. Make it so easy you can\'t say no. Do it at the same time daily. Track completion. After 21 days, add another. You got this! 🚀',
+            'default': 'Great question! Here are key habit tips: Be consistent, start small, track progress, celebrate wins, and be patient with yourself. What specific habit are you working on? 🌟'
+        };
+
+        // Simple keyword matching
+        const lowerMessage = message.toLowerCase();
+        let botReply = responses.default;
+        
+        if (lowerMessage.includes('motivat')) botReply = responses.motivated;
+        else if (lowerMessage.includes('morning')) botReply = responses.morning;
+        else if (lowerMessage.includes('stick') || lowerMessage.includes('maintain')) botReply = responses.stick;
+        else if (lowerMessage.includes('start') || lowerMessage.includes('begin')) botReply = responses.start;
+
+        // Simulate typing delay
+        setTimeout(() => {
+            typingIndicator.classList.remove('show');
+            addMessage(botReply);
+        }, 1500);
+    }
+
+    chatbotSend.addEventListener('click', sendMessage);
+    chatbotInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    // Filter habits
+    window.filterHabits = function(type) {
+        const habits = document.querySelectorAll('.habit-card-new');
+        habits.forEach(habit => {
+            if (type === 'all') {
+                habit.style.display = 'flex';
+            } else if (type === 'today') {
+                habit.style.display = habit.classList.contains('completed-today') ? 'flex' : 'none';
+            } else if (type === 'streak') {
+                const streakText = habit.querySelector('.habit-streak-info span').textContent;
+                const streakNum = parseInt(streakText);
+                habit.style.display = streakNum > 3 ? 'flex' : 'none';
+            }
+        });
+    };
+});
+</script>
+{% endblock %}

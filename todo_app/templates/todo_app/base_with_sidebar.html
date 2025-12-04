@@ -1,0 +1,93 @@
+<!-- todo_app/templates/todo_app/base_with_sidebar.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ profile.theme_mode|default:'light' }}">
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TaskFlow{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✓</text></svg>">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Theme Loader Script - CRITICAL: Must run before CSS -->
+    <script>
+        (function() {
+            const root = document.documentElement;
+            root.style.setProperty('--primary-color', '{{ profile.primary_color|default:"#3b82f6" }}');
+            root.style.setProperty('--secondary-color', '{{ profile.secondary_color|default:"#8b5cf6" }}');
+            root.style.setProperty('--accent-color', '{{ profile.accent_color|default:"#ec4899" }}');
+        })();
+    </script>
+    
+    <!-- GLOBAL Theme System CSS - Loaded FIRST -->
+    <link rel="stylesheet" href="{% static 'css/theme-system.css' %}">
+    
+    <!-- Component-specific CSS -->
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+    <body data-theme="{{ profile.theme_mode|default:'light' }}" 
+        data-theme-mode="{{ profile.theme_mode|default:'light' }}"
+        data-primary-color="{{ profile.primary_color|default:'#3b82f6' }}"
+        data-secondary-color="{{ profile.secondary_color|default:'#8b5cf6' }}"
+        data-accent-color="{{ profile.accent_color|default:'#ec4899' }}">
+        
+        <div class="app-layout">
+            <!-- Sidebar -->
+            {% include 'todo_app/partials/sidebar.html' %}
+            
+            <!-- Main Content Area -->
+            <main class="main-content">
+                <!-- Django Messages -->
+                {% if messages %}
+                <div class="messages-container">
+                    {% for message in messages %}
+                    <div class="message-toast {{ message.tags }}" data-auto-hide="5000">
+                        <i class="fa-solid fa-{% if message.tags == 'error' %}circle-exclamation{% elif message.tags == 'success' %}circle-check{% elif message.tags == 'warning' %}triangle-exclamation{% else %}info-circle{% endif %}"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- Page Content -->
+                {% block main_content %}{% endblock %}
+            </main>
+        </div>
+        
+        <!-- Theme Loader Script -->
+        <script src="{% static 'js/theme-loader.js' %}"></script>
+        
+        <!-- Global JavaScript -->
+        <!-- Theme Loader Script -->
+        <script src="{% static 'js/theme-loader.js' %}"></script>
+        
+        <!-- Global JavaScript -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Auto-hide messages
+                const messages = document.querySelectorAll('[data-auto-hide]');
+                messages.forEach(msg => {
+                    const delay = parseInt(msg.getAttribute('data-auto-hide')) || 5000;
+                    setTimeout(() => {
+                        msg.style.transition = 'all 0.3s ease';
+                        msg.style.opacity = '0';
+                        msg.style.transform = 'translateX(400px)';
+                        setTimeout(() => msg.remove(), 300);
+                    }, delay);
+                });
+            });
+            
+            window.confirmDelete = function(message) {
+                return confirm(message || 'Are you sure?');
+            };
+        </script>
+        
+        {% block extra_js %}{% endblock %}
+    </body>
+</html>

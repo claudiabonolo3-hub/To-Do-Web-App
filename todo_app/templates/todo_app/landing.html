@@ -1,0 +1,207 @@
+{% extends "todo_app/base.html" %}
+{% load static %}
+
+{% block title %}TaskFlow - Your Perfect Productivity Partner{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto; padding: 60px 20px; text-align: center;">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="app-icon" style="width: 100px; height: 100px; margin: 0 auto 30px;">
+            <i class="fa-solid fa-circle-check" style="font-size: 3rem;"></i>
+        </div>
+        
+        <h1 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 20px; color: #1f2937;">
+            Welcome to TaskFlow ✨
+        </h1>
+        
+        <p style="font-size: 1.2rem; color: #6b7280; margin-bottom: 40px; max-width: 700px; margin-left: auto; margin-right: auto;">
+            Your intelligent task management companion
+        </p>
+        
+        <!-- CTA Buttons -->
+        <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 80px;">
+            <a href="{% url 'register' %}" class="gradient-btn" style="padding: 15px 40px; text-decoration: none;">
+                Get Started
+            </a>
+            <a href="{% url 'login' %}" class="btn-secondary" style="padding: 15px 40px; text-decoration: none;">
+                Login
+            </a>
+        </div>
+    </div>
+
+    <!-- Why TaskFlow Section -->
+    <div class="features-section">
+        <h2 style="font-size: 2rem; margin-bottom: 50px; color: #1f2937;">
+            Why TaskFlow is Your Perfect Productivity Partner
+        </h2>
+        
+        <p style="font-size: 1.1rem; color: #6b7280; margin-bottom: 60px; max-width: 800px; margin-left: auto; margin-right: auto;">
+            TaskFlow is designed to help you manage tasks effortlessly, build lasting habits, and achieve your goals with intelligent reminders and seamless organization.
+        </p>
+        
+        <!-- Feature Cards Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 80px;">
+            <!-- Smart Reminders -->
+            <div class="feature-card">
+                <div class="feature-icon" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6);">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+                <h3>Smart Reminders</h3>
+                <p>Never miss a deadline with intelligent notifications</p>
+            </div>
+            
+            <!-- Calendar Integration -->
+            <div class="feature-card">
+                <div class="feature-icon" style="background: linear-gradient(135deg, #8b5cf6, #ec4899);">
+                    <i class="fa-regular fa-calendar"></i>
+                </div>
+                <h3>Calendar Integration</h3>
+                <p>Seamlessly sync tasks with your calendar</p>
+            </div>
+            
+            <!-- Priority Management -->
+            <div class="feature-card">
+                <div class="feature-icon" style="background: linear-gradient(135deg, #ec4899, #f59e0b);">
+                    <i class="fa-solid fa-bullseye"></i>
+                </div>
+                <h3>Priority Management</h3>
+                <p>Focus on what matters most with smart prioritization</p>
+            </div>
+            
+            <!-- Habit Tracking -->
+            <div class="feature-card">
+                <div class="feature-icon" style="background: linear-gradient(135deg, #f59e0b, #10b981);">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <h3>Habit Tracking</h3>
+                <p>Build better habits with consistent tracking</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Testimonials Section -->
+    <div class="testimonials-section">
+        <h2 style="font-size: 1.8rem; margin-bottom: 40px; color: #1f2937;">
+            What Our Users Say
+        </h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+            <div class="testimonial-card">
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <p>"TaskFlow has transformed how I manage my daily tasks. The reminder system is a game-changer!"</p>
+            </div>
+            
+            <div class="testimonial-card">
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <p>"The habit tracking and priority features help me stay focused on what matters most."</p>
+            </div>
+            
+            <div class="testimonial-card">
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <p>"Beautiful interface, powerful features. The calendar integration is seamless!"</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.feature-card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+}
+
+.feature-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.feature-icon i {
+    font-size: 2rem;
+    color: white;
+}
+
+.feature-card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    color: #1f2937;
+}
+
+.feature-card p {
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+.testimonial-card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.stars {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+}
+
+.testimonial-card p {
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+.app-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.gradient-btn {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.gradient-btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: white;
+    color: #6b7280;
+    border: 2px solid #e5e7eb;
+    padding: 15px 40px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background: #f9fafb;
+}
+</style>
+{% endblock %}

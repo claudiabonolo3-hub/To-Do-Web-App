@@ -1,0 +1,48 @@
+<!-- todo_project/todo_app/templates/todo_app/login.html -->
+{% extends "todo_app/base.html" %}
+{% load static %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="landing-card" style="margin: 10vh auto;">
+    <div class="app-icon">
+        <i class="fa-solid fa-right-to-bracket"></i>
+    </div>
+    <h1 style="font-size: 1.8rem; font-weight: 600; margin-bottom: 10px; text-align: center;">Welcome Back!</h1>
+    <p style="margin: 10px 0 25px; color: #777; text-align: center;">
+        Login to continue your productivity journey
+    </p>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 18px;">
+            <label for="username" style="display: block; margin-bottom: 8px; color: #555; font-weight: 500; text-align: left;">Username</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username" class="text-input" required>
+        </div>
+        
+        <div style="margin-bottom: 25px;">
+            <label for="password" style="display: block; margin-bottom: 8px; color: #555; font-weight: 500; text-align: left;">Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" class="text-input" required>
+        </div>
+        
+        <div style="text-align: center;">
+            <button type="submit" class="gradient-btn" style="width: 100%; max-width: 350px;">
+                Login
+            </button>
+        </div>
+        
+        <p style="margin-top: 20px; color: #777; text-align: center;">
+            Don't have an account? 
+            <a href="{% url 'register' %}" style="color: #667eea; font-weight: 600; text-decoration: none;">Sign up here</a>
+        </p>
+    </form>
+</div>
+{% endblock %}

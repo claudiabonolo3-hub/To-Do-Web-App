@@ -1,0 +1,66 @@
+{% extends "todo_app/base.html" %}
+{% load static %}
+{% block title %}Your Productivity Style{% endblock %}
+{% block content %}
+<div class="auth-container">
+    <div class="onboarding-card" style="max-width: 900px; padding: 60px 80px;">
+        <div class="app-icon">
+            <i class="fa-solid fa-clock"></i>
+        </div>
+        
+        <h1 style="text-align: center;">Tell me about yourself, {{ user_name }}! ✨</h1>
+        <p style="font-size: 1.1rem; color: #6b7280; margin-bottom: 40px; text-align: center;">
+            Are you a morning person or evening person?
+        </p>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="preference-options" style="grid-template-columns: repeat(3, 1fr); gap: 30px; max-width: 100%;">
+                <label class="preference-card">
+                    <input type="radio" name="productivity_preference" value="morning" required>
+                    <div class="preference-content">
+                        <div class="preference-icon">☀️</div>
+                        <h3>Morning Person</h3>
+                        <p>I'm most productive early in the day</p>
+                    </div>
+                </label>
+                
+                <label class="preference-card">
+                    <input type="radio" name="productivity_preference" value="evening" required>
+                    <div class="preference-content">
+                        <div class="preference-icon">🌙</div>
+                        <h3>Evening Person</h3>
+                        <p>I work better later in the day</p>
+                    </div>
+                </label>
+                
+                <label class="preference-card">
+                    <input type="radio" name="productivity_preference" value="anytime" required>
+                    <div class="preference-content">
+                        <div class="preference-icon">🌟</div>
+                        <h3>No Preference</h3>
+                        <p>I'm flexible with my schedule</p>
+                    </div>
+                </label>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button type="submit" class="gradient-btn" style="width: 100%; max-width: 400px;">
+                    Continue <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+// Add visual feedback for selection
+document.querySelectorAll('.preference-card').forEach(card => {
+    card.addEventListener('click', function() {
+        document.querySelectorAll('.preference-card').forEach(c => c.classList.remove('selected'));
+        this.classList.add('selected');
+        this.querySelector('input[type="radio"]').checked = true;
+    });
+});
+</script>
+{% endblock %}

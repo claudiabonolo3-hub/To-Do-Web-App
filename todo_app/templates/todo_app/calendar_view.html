@@ -1,0 +1,122 @@
+<!-- todo_app/templates/todo_app/calendar_view.html -->
+{% extends "todo_app/base_with_sidebar.html" %}
+{% load static %}
+{% block title %}Calendar{% endblock %}
+{% block main_content %}
+<div class="calendar-container">
+    <!-- Calendar Header -->
+    <div class="calendar-header">
+        <button class="nav-arrow" id="prev-month">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <h2 class="calendar-month">{{ current_month }} {{ current_year }}</h2>
+        <button class="nav-arrow" id="next-month">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+    </div>
+    
+    <!-- Calendar Grid -->
+    <div class="calendar-grid">
+        <!-- Day Headers -->
+        <div class="calendar-day-header">Sun</div>
+        <div class="calendar-day-header">Mon</div>
+        <div class="calendar-day-header">Tue</div>
+        <div class="calendar-day-header">Wed</div>
+        <div class="calendar-day-header">Thu</div>
+        <div class="calendar-day-header">Fri</div>
+        <div class="calendar-day-header">Sat</div>
+        
+        <!-- Calendar Days -->
+        {% for week in calendar_weeks %}
+            {% for day in week %}
+            <div class="calendar-day {% if day.is_today %}today{% endif %} {% if not day.in_month %}other-month{% endif %}">
+                <span class="day-number">{{ day.day }}</span>
+                
+                {% if day.tasks %}
+                <div class="day-tasks">
+                    {% for task in day.tasks %}
+                    <div class="task-pill {% if task.is_overdue %}overdue{% elif task.is_completed %}completed{% else %}active{% endif %}">
+                        {{ task.title|truncatechars:15 }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+    
+    <!-- Legend -->
+    <div class="calendar-legend">
+        <div class="legend-item">
+            <span class="legend-dot active"></span>
+            <span>Active Task</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-dot completed"></span>
+            <span>Completed</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-dot overdue"></span>
+            <span>Overdue</span>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden data attributes for JavaScript -->
+<div id="calendar-data" 
+     data-current-month="{{ current_month_num }}" 
+     data-current-year="{{ current_year }}" 
+     style="display: none;">
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const prevBtn = document.getElementById('prev-month');
+    const nextBtn = document.getElementById('next-month');
+    const calendarData = document.getElementById('calendar-data');
+    
+    // Get current month and year from data attributes
+    const defaultMonth = parseInt(calendarData.dataset.currentMonth);
+    const defaultYear = parseInt(calendarData.dataset.currentYear);
+    
+    prevBtn.addEventListener('click', function() {
+        const currentUrl = new URL(window.location);
+        const month = parseInt(currentUrl.searchParams.get('month') || defaultMonth);
+        const year = parseInt(currentUrl.searchParams.get('year') || defaultYear);
+        
+        let newMonth = month - 1;
+        let newYear = year;
+        
+        if (newMonth < 1) {
+            newMonth = 12;
+            newYear--;
+        }
+        
+        currentUrl.searchParams.set('month', newMonth);
+        currentUrl.searchParams.set('year', newYear);
+        window.location = currentUrl.toString();
+    });
+    
+    nextBtn.addEventListener('click', function() {
+        const currentUrl = new URL(window.location);
+        const month = parseInt(currentUrl.searchParams.get('month') || defaultMonth);
+        const year = parseInt(currentUrl.searchParams.get('year') || defaultYear);
+        
+        let newMonth = month + 1;
+        let newYear = year;
+        
+        if (newMonth > 12) {
+            newMonth = 1;
+            newYear++;
+        }
+        
+        currentUrl.searchParams.set('month', newMonth);
+        currentUrl.searchParams.set('year', newYear);
+        window.location = currentUrl.toString();
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,57 @@
+<!--todo_project/todo_app/templates/todo_app/task_input.html-->
+{% extends "todo_app/base.html" %}
+{% load static %}
+{% block title %}Add Your First Task{% endblock %}
+{% block content %}
+<div class="landing-card" style="max-width: 550px; margin: 10vh auto;">
+    <h2 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 10px; text-align: center;">Great to meet you, {{ user_name }}! 👋</h2>
+    <p style="margin: 10px 0 30px; color: #777; text-align: center;">
+        Let's start by adding some tasks. Don't worry, you can always add more later!
+    </p>
+    <form method="post" action="{% url 'onboarding_tasks' %}" id="task-form">
+        {% csrf_token %}
+        
+        <div id="task-fields-container" style="margin-bottom: 30px;">
+            <div class="task-field" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 500; text-align: left;">Task 1</label>
+                <input type="text" name="task_1" placeholder="e.g. Complete project report" class="text-input" required>
+            </div>
+        </div>
+        
+        <div style="text-align: center;">
+            <button type="button" id="add-another-btn" class="secondary-btn" style="width: 100%; margin-bottom: 40px;">
+                <i class="fa-solid fa-plus"></i> Add Another Task
+            </button>
+        </div>
+        
+        <div style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+            <button type="submit" name="skip_for_now" class="secondary-btn" style="background: none; box-shadow: none; color: #888; font-size: 1rem;">
+                Skip for now
+            </button>
+            <button type="submit" name="continue" class="gradient-btn" style="flex-grow: 1; max-width: 250px;">
+                Continue <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let taskCount = 1;
+        const container = document.getElementById('task-fields-container');
+        const addButton = document.getElementById('add-another-btn');
+        addButton.addEventListener('click', function() {
+            taskCount++;
+            const newField = document.createElement('div');
+            newField.className = 'task-field';
+            newField.style.marginBottom = '15px';
+            newField.innerHTML = `
+                <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 500; text-align: left;">Task ${taskCount}</label>
+                <input type="text" name="task_${taskCount}" placeholder="Task ${taskCount}" class="text-input">
+            `;
+            container.appendChild(newField);
+        });
+    });
+</script>
+{% endblock %}

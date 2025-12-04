@@ -1,0 +1,58 @@
+<!-- todo_project/todo_app/templates/todo_app/onboarding_habits.html -->
+{% extends "todo_app/base.html" %}
+{% load static %}
+{% block title %}Your Habits{% endblock %}
+{% block content %}
+<div class="landing-card" style="max-width: 600px; margin: 8vh auto;">
+    <div class="app-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+        <i class="fa-solid fa-heart"></i>
+    </div>
+    <h1 style="font-size: 1.8rem; font-weight: 600; margin-bottom: 10px; text-align: center;">
+        Almost there, {{ user_name }}! 🎯
+    </h1>
+    <p style="margin: 10px 0 30px; color: #777; font-size: 1.1rem; text-align: center;">
+        Tell me about your habits so I can help you crush them!
+    </p>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div id="habits-container" style="margin-bottom: 30px;">
+            <div class="habit-input" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 500; text-align: left;">Habit 1</label>
+                <input type="text" name="habit_1" placeholder="e.g. Drink 2L of water" class="text-input">
+            </div>
+        </div>
+        
+        <div style="text-align: center;">
+            <button type="button" id="add-habit-field" class="secondary-btn" style="width: 100%; margin-bottom: 30px;">
+                <i class="fa-solid fa-plus"></i> Add Another Habit
+            </button>
+        </div>
+        
+        <div style="display: flex; justify-content: center; gap: 15px;">
+            <button type="submit" name="skip" class="secondary-btn" style="background: none; box-shadow: none; color: #888;">
+                Skip for now
+            </button>
+            <button type="submit" class="gradient-btn" style="flex: 1; max-width: 250px;">
+                Let's Go! <i class="fa-solid fa-rocket"></i>
+            </button>
+        </div>
+    </form>
+</div>
+<script>
+    let habitCount = 1;
+    document.getElementById('add-habit-field').addEventListener('click', function() {
+        habitCount++;
+        const container = document.getElementById('habits-container');
+        const newField = document.createElement('div');
+        newField.className = 'habit-input';
+        newField.style.marginBottom = '15px';
+        newField.innerHTML = `
+            <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 500; text-align: left;">Habit ${habitCount}</label>
+            <input type="text" name="habit_${habitCount}" placeholder="Habit ${habitCount}" class="text-input">
+        `;
+        container.appendChild(newField);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,235 @@
+<!-- todo_app/templates/todo_app/tasks_dashboard.html -->
+{% extends "todo_app/base_with_sidebar.html" %}
+{% load static %}
+
+{% block title %}My Tasks{% endblock %}
+
+{% block main_content %}
+<div class="tasks-container">
+    <!-- Header Section -->
+    <div class="page-header">
+        <div class="header-left">
+            <h1 class="page-title">My Tasks</h1>
+            <div class="status-badges">
+                <span class="status-badge active">{{ active_count }} Active</span>
+                <span class="status-badge completed">{{ completed_count }} Completed</span>
+                {% if needs_attention_count > 0 %}
+                <span class="status-badge attention">{{ needs_attention_count }} Needs Attention</span>
+                {% endif %}
+            </div>
+        </div>
+        <button id="add-task-btn" class="add-btn gradient-add-btn">
+            <i class="fa-solid fa-plus"></i> Add Task
+        </button>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="tabs-container">
+        <button class="tab-button active" data-tab="all">All</button>
+        <button class="tab-button" data-tab="active">Active</button>
+        <button class="tab-button" data-tab="completed">Completed</button>
+        <button class="tab-button" data-tab="attention">Needs Attention
+            {% if needs_attention_count > 0 %}
+            <span class="attention-badge">{{ needs_attention_count }}</span>
+            {% endif %}
+        </button>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content active" id="all-tab">
+        {% if not all_tasks %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fa-regular fa-circle-check"></i>
+            </div>
+            <p class="empty-text">No tasks yet</p>
+        </div>
+        {% else %}
+        <div class="tasks-list">
+            {% for task in all_tasks %}
+            <div class="task-card">
+                <form method="POST" action="{% url 'complete_task' task.id %}" class="task-checkbox-form">
+                    {% csrf_token %}
+                    <input type="checkbox" {% if task.is_completed %}checked{% endif %} onchange="this.form.submit()">
+                </form>
+                
+                <div class="task-content">
+                    <div class="task-header">
+                        <h3 class="task-title {% if task.is_completed %}completed{% endif %}">{{ task.title }}</h3>
+                        <div class="task-badges">
+                            {% if task.priority == 2 %}
+                            <span class="priority-badge medium">medium</span>
+                            {% elif task.priority == 1 %}
+                            <span class="priority-badge high">high</span>
+                            {% endif %}
+                            
+                            {% if task.is_overdue %}
+                            <span class="status-badge overdue">
+                                <i class="fa-solid fa-circle-exclamation"></i> Overdue
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if task.description %}
+                    <p class="task-description">{{ task.description }}</p>
+                    {% endif %}
+                    
+                    <div class="task-meta">
+                        {% if task.due_date %}
+                        <span class="meta-item">
+                            <i class="fa-regular fa-calendar"></i>
+                            {{ task.due_date|date:"M j, Y" }}
+                        </span>
+                        {% endif %}
+                        
+                        {% if task.due_time %}
+                        <span class="meta-item">
+                            <i class="fa-regular fa-clock"></i>
+                            {{ task.due_time|time:"g:i A" }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="tab-content" id="active-tab">
+        {% if not active_tasks %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fa-regular fa-circle-check"></i>
+            </div>
+            <p class="empty-text">No active tasks</p>
+        </div>
+        {% else %}
+        <div class="tasks-list">
+            {% for task in active_tasks %}
+            <!-- Same task card structure as above -->
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="tab-content" id="completed-tab">
+        {% if not completed_tasks %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fa-regular fa-circle-check"></i>
+            </div>
+            <p class="empty-text">No completed tasks</p>
+        </div>
+        {% else %}
+        <div class="tasks-list">
+            {% for task in completed_tasks %}
+            <!-- Same task card structure as above -->
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="tab-content" id="attention-tab">
+        {% if not attention_tasks %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fa-regular fa-circle-check"></i>
+            </div>
+            <p class="empty-text">No tasks need attention</p>
+        </div>
+        {% else %}
+        <div class="tasks-list">
+            {% for task in attention_tasks %}
+            <!-- Same task card structure as above -->
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add Task Modal -->
+<div id="task-modal" class="modal-overlay">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <h2>Add New Task</h2>
+            <button class="modal-close">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'add_task' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Task Title *</label>
+                <input type="text" name="title" class="form-input" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" class="form-input" rows="3"></textarea>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Due Date</label>
+                    <input type="date" name="due_date" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Due Time</label>
+                    <input type="time" name="due_time" class="form-input">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Priority</label>
+                <select name="priority" class="form-input">
+                    <option value="3">Low</option>
+                    <option value="2" selected>Medium</option>
+                    <option value="1">High</option>
+                </select>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary modal-cancel">Cancel</button>
+                <button type="submit" class="btn-primary">Add Task</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tab switching
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const targetTab = button.dataset.tab;
+            
+            // Update active states
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            button.classList.add('active');
+            document.getElementById(targetTab + '-tab').classList.add('active');
+        });
+    });
+    
+    // Modal handling
+    const modal = document.getElementById('task-modal');
+    const addBtn = document.getElementById('add-task-btn');
+    const closeBtn = modal.querySelector('.modal-close');
+    const cancelBtn = modal.querySelector('.modal-cancel');
+    
+    addBtn.addEventListener('click', () => modal.classList.add('show'));
+    closeBtn.addEventListener('click', () => modal.classList.remove('show'));
+    cancelBtn.addEventListener('click', () => modal.classList.remove('show'));
+    
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('show');
+    });
+});
+</script>
+{% endblock %}

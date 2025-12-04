@@ -1,0 +1,44 @@
+<!-- todo_app/templates/todo_app/partials/sidebar.html -->
+{% load static %}
+
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <div class="logo-container">
+            <div class="logo-icon">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <span class="logo-text">TaskFlow</span>
+        </div>
+    </div>
+
+    <div class="sidebar-welcome">
+        <p>Welcome back,</p>
+        <p class="user-name">{{ user_name|default:user.username }}!</p>
+    </div>
+
+    <nav class="sidebar-nav">
+        <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+            <i class="fa-solid fa-list-check"></i>
+            <span>Tasks</span>
+        </a>
+        <a href="{% url 'habits_view' %}" class="nav-item {% if request.resolver_match.url_name == 'habits_view' %}active{% endif %}">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>Habits</span>
+        </a>
+        <a href="{% url 'calendar_view' %}" class="nav-item {% if request.resolver_match.url_name == 'calendar_view' %}active{% endif %}">
+            <i class="fa-regular fa-calendar"></i>
+            <span>Calendar</span>
+        </a>
+        <a href="{% url 'settings_view' %}" class="nav-item {% if request.resolver_match.url_name == 'settings_view' %}active{% endif %}">
+            <i class="fa-solid fa-gear"></i>
+            <span>Settings</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <a href="{% url 'logout' %}" class="nav-item logout-btn">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+        </a>
+    </div>
+</aside>
