@@ -1,0 +1,31 @@
+{% extends 'tasks/base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6 col-md-8">
+    <div class="card p-4 shadow-lg" style="border-radius: 16px; background: linear-gradient(135deg, #fffaf5, #ffd6d6);">
+      <h3 class="mb-4 text-center">📝 Add a New Task</h3>
+      <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Title</label>
+          {{ form.title }}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Description</label>
+          {{ form.description }}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Due Date</label>
+          <input type="date" name="due_date" class="form-control" required>
+        </div>
+
+        <div class="text-center">
+          <button type="submit" class="btn btn-pink px-4 py-2">💖 Save Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
